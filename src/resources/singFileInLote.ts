@@ -1,11 +1,11 @@
 import api from "../api";
 
-interface SignFileInLoteProps {
+interface SingFileInLoteProps {
   pdfs: File[];
   code: string;
 }
 
-const signFileInLote = ({ pdfs, code }: SignFileInLoteProps) => {
+const signFileInLote = ({ pdfs, code }: SingFileInLoteProps) => {
   const mulPartFormData = new FormData();
 
   for (let index = 0; index < pdfs.length; index++) {

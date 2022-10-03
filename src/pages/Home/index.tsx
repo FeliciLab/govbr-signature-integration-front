@@ -1,12 +1,14 @@
+import { Button, Container, TextField } from "@mui/material";
 import fileDownload from "js-file-download";
 import React from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Link, useSearchParams } from "react-router-dom";
-import signFile from "../../resources/signFile";
-import signFileInLote from "../../resources/signFileInLote";
-import getGovBrUri from "../../utils/getGovBrUri";
-import { Container, Field, Options } from "./styles";
+import { useLocalStorage } from "usehooks-ts";
+import signFile from "../../resources/singFile";
+import singFileInLote from "../../resources/singFileInLote";
+import getGovBrUri, { GetGovBrUriScope } from "../../utils/getGovBrUri";
+import { Field, Options } from "./styles";
 
 interface HomeFormData {
   pdfs: File[];
@@ -17,6 +19,12 @@ const Home: React.FC = () => {
 
   const code = searchParams.get("code");
 
+  // scope é o que define se a assunatura do certificado será em lote ou normal.
+  const [scope, setScope] = useLocalStorage<GetGovBrUriScope>(
+    "@govbr-signature-integration-front:scope",
+    "sign"
+  );
+
   const { register, handleSubmit } = useForm<HomeFormData>();
 
   const onSubmit = async ({ pdfs }: HomeFormData) => {
@@ -24,7 +32,7 @@ const Home: React.FC = () => {
       const inLote = pdfs.length > 1;
 
       const signPdfsPromise = inLote
-        ? signFileInLote({ pdfs, code })
+        ? singFileInLote({ pdfs, code })
         : signFile({
             pdf: pdfs[0],
             code,
@@ -43,19 +51,20 @@ const Home: React.FC = () => {
   };
 
   return (
-    <Container>
+    <Container maxWidth="sm">
       <h1>Assinador</h1>
       {code ? (
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Field>
-            <label htmlFor="pdf">Arquivo</label>
+          <Button variant="outlined" component="label">
+            Upload do arquivo
             <input
+              hidden
               type="file"
               accept="application/pdf"
-              multiple
+              multiple={scope === "signature_session"}
               {...register("pdfs")}
             />
-          </Field>
+          </Button>
           <Options>
             <button type="submit">Enviar</button>
             <Link to="/">Voltar</Link>
@@ -63,8 +72,13 @@ const Home: React.FC = () => {
         </form>
       ) : (
         <Options>
-          <a href={getGovBrUri("sign")}>Assinatura um arquivo</a>
-          <a href={getGovBrUri("signature_session")}>
+          <a href={getGovBrUri("sign")} onClick={() => setScope("sign")}>
+            Assinatura um arquivo
+          </a>
+          <a
+            href={getGovBrUri("signature_session")}
+            onClick={() => setScope("signature_session")}
+          >
             Assinatura arquivo em Lote
           </a>
         </Options>

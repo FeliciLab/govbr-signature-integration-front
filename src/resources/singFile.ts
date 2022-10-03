@@ -1,11 +1,11 @@
 import api from "../api";
 
-interface SignFileProps {
+interface SingFileProps {
   pdf: File;
   code: string;
 }
 
-const signFile = ({ pdf, code }: SignFileProps) => {
+const singFile = ({ pdf, code }: SingFileProps) => {
   const mulPartFormData = new FormData();
 
   mulPartFormData.append("pdf", pdf);
@@ -19,4 +19,4 @@ const signFile = ({ pdf, code }: SignFileProps) => {
   });
 };
 
-export default signFile;
+export default singFile;
