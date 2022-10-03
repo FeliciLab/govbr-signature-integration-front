@@ -9,7 +9,6 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { purple } from "@mui/material/colors";
 import fileDownload from "js-file-download";
 import React from "react";
 import { useForm } from "react-hook-form";
@@ -68,6 +67,7 @@ const Home: React.FC = () => {
         alignItems: "center",
         width: "100%",
         height: "100vh",
+        backgroundColor: (theme) => theme.palette.background.default,
       }}
     >
       <Container maxWidth="sm">
@@ -92,21 +92,30 @@ const Home: React.FC = () => {
               <Button variant="contained" type="submit">
                 Enviar
               </Button>
-              <IconButton onClick={() => navigate("/")}>
-                <ChevronLeftIcon />
-              </IconButton>
+              <Button
+                variant="contained"
+                onClick={() => navigate("/")}
+                startIcon={<ChevronLeftIcon />}
+              >
+                Voltar
+              </Button>
             </Stack>
           </form>
         ) : (
           <Stack spacing={2}>
-            <Link href={getGovBrUri("sign")} onClick={() => setScope("sign")}>
-              Assinatura um arquivo
+            <Link
+              variant="button"
+              href={getGovBrUri("sign")}
+              onClick={() => setScope("sign")}
+            >
+              Assinar um arquivo
             </Link>
             <Link
+              variant="button"
               href={getGovBrUri("signature_session")}
               onClick={() => setScope("signature_session")}
             >
-              Assinatura arquivo em Lote
+              Assinar arquivos em Lote
             </Link>
           </Stack>
         )}
