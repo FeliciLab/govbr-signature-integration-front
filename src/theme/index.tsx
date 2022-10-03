@@ -4,9 +4,9 @@ import { createTheme } from "@mui/material/styles";
 const theme = createTheme({
   palette: {
     primary: {
-      main: green[900],
+      main: green[700],
     },
-    background: { default: grey[200], paper: grey[500] },
+    background: { default: grey[200], paper: grey[300] },
   },
 });
 

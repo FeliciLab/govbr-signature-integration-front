@@ -1,26 +1,15 @@
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import {
-  Box,
-  Button,
-  Container,
-  IconButton,
-  Link,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Container, Link, Stack, Typography } from "@mui/material";
 import fileDownload from "js-file-download";
-import React from "react";
-import { useForm } from "react-hook-form";
+import React, { useState } from "react";
+import { useDropzone } from "react-dropzone";
 import toast from "react-hot-toast";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useLocalStorage } from "usehooks-ts";
+import PDfDropZone from "../../components/PDfDropZone";
 import signFile from "../../resources/singFile";
 import singFileInLote from "../../resources/singFileInLote";
 import getGovBrUri, { GetGovBrUriScope } from "../../utils/getGovBrUri";
-interface HomeFormData {
-  pdfs: File[];
-}
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -29,24 +18,35 @@ const Home: React.FC = () => {
 
   const code = searchParams.get("code");
 
+  const [loading, setLoading] = useState(false);
+
+  const [codeWasUsed, setCodeWasUsed] = useState(false);
+
   // scope é o que define se a assunatura do certificado será em lote ou normal.
   const [scope, setScope] = useLocalStorage<GetGovBrUriScope>(
     "@govbr-signature-integration-front:scope",
     "sign"
   );
 
-  const { register, handleSubmit } = useForm<HomeFormData>();
+  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
+    accept: {
+      "application/pdf": [".pdf"],
+    },
+    multiple: scope === "signature_session",
+  });
 
-  const onSubmit = async ({ pdfs }: HomeFormData) => {
+  const handleSubmit = async () => {
     if (code) {
-      const inLote = pdfs.length > 1;
+      const inLote = scope === "signature_session";
 
       const signPdfsPromise = inLote
-        ? singFileInLote({ pdfs, code })
+        ? singFileInLote({ pdfs: acceptedFiles, code })
         : signFile({
-            pdf: pdfs[0],
+            pdf: acceptedFiles[0],
             code,
           });
+
+      setLoading(true);
 
       const { data } = await toast.promise(signPdfsPromise, {
         loading: "Enviando",
@@ -54,7 +54,10 @@ const Home: React.FC = () => {
         error: "Algo de errado aconteceu",
       });
 
-      const outputNameFile = inLote ? "lote.zip" : pdfs[0].name;
+      setCodeWasUsed(true);
+      setLoading(false);
+
+      const outputNameFile = inLote ? "lote.zip" : acceptedFiles[0].name;
 
       fileDownload(data, outputNameFile);
     }
@@ -73,34 +76,27 @@ const Home: React.FC = () => {
       <Container maxWidth="sm">
         <Typography variant="h4">Assinador</Typography>
         {code ? (
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <Stack spacing={2}>
-              <Button
-                variant="outlined"
-                component="label"
-                endIcon={<CloudUploadIcon />}
-              >
-                Upload do arquivo
-                <input
-                  hidden
-                  type="file"
-                  accept="application/pdf"
-                  multiple={scope === "signature_session"}
-                  {...register("pdfs")}
-                />
-              </Button>
-              <Button variant="contained" type="submit">
-                Enviar
-              </Button>
-              <Button
-                variant="contained"
-                onClick={() => navigate("/")}
-                startIcon={<ChevronLeftIcon />}
-              >
-                Voltar
-              </Button>
-            </Stack>
-          </form>
+          <Stack spacing={2}>
+            <PDfDropZone
+              acceptedFiles={acceptedFiles}
+              getInputProps={getInputProps}
+              getRootProps={getRootProps}
+            />
+            <Button
+              variant="contained"
+              onClick={handleSubmit}
+              disabled={codeWasUsed || loading}
+            >
+              Enviar
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={() => navigate("/")}
+              startIcon={<ChevronLeftIcon />}
+            >
+              Voltar
+            </Button>
+          </Stack>
         ) : (
           <Stack spacing={2}>
             <Link
