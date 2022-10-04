@@ -1,6 +1,6 @@
-import { IconButton, Box, Typography } from "@mui/material";
-import React from "react";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { IconButton, Box, Typography } from '@mui/material';
+import React from 'react';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 interface FilesListProps {
   files: File[];
@@ -14,9 +14,9 @@ const FilesList: React.FC<FilesListProps> = ({ files, removeFile }) => {
         <Box
           key={file.name}
           sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
           }}
         >
           <Typography variant="body1">{file.name}</Typography>

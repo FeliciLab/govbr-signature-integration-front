@@ -1,5 +1,5 @@
 const routerNames = {
-  HOME: "/",
+  HOME: '/',
 };
 
 export default routerNames;

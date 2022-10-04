@@ -1,10 +1,10 @@
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import { Paper, Typography, useTheme, Button } from "@mui/material";
-import { Stack } from "@mui/system";
-import React from "react";
-import { useDropzone } from "react-dropzone";
-import FilesList from "../FilesList";
-import DeleteIcon from "@mui/icons-material/Delete";
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import { Paper, Typography, useTheme, Button } from '@mui/material';
+import { Stack } from '@mui/system';
+import React from 'react';
+import { useDropzone } from 'react-dropzone';
+import FilesList from '../FilesList';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 interface PDfDropZoneProps {
   files: File[];
@@ -35,7 +35,7 @@ const PDfDropZone: React.FC<PDfDropZoneProps> = ({
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: {
-      "application/pdf": [".pdf"],
+      'application/pdf': ['.pdf'],
     },
     multiple,
     onDrop,
@@ -47,14 +47,14 @@ const PDfDropZone: React.FC<PDfDropZoneProps> = ({
       sx={{
         padding: 2,
         border: 2,
-        borderStyle: "dashed",
+        borderStyle: 'dashed',
         borderColor: palette.primary.main,
       }}
     >
       <Stack alignItems="center" {...getRootProps()}>
         <input {...getInputProps()} />
         <CloudUploadIcon fontSize="large" />
-        <Typography variant="body1" style={{ textAlign: "center" }}>
+        <Typography variant="body1" style={{ textAlign: 'center' }}>
           Arraste e solte alguns arquivos aqui ou clique para selecionar os
           arquivos
         </Typography>

@@ -1,4 +1,4 @@
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import {
   Box,
   Button,
@@ -7,23 +7,23 @@ import {
   Stack,
   Tooltip,
   Typography,
-} from "@mui/material";
-import fileDownload from "js-file-download";
-import React, { useState } from "react";
-import toast from "react-hot-toast";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useLocalStorage } from "usehooks-ts";
-import PDfDropZone from "../../components/PDfDropZone";
-import signFile from "../../resources/singFile";
-import singFileInLote from "../../resources/singFileInLote";
-import getGovBrUri, { GetGovBrUriScope } from "../../utils/getGovBrUri";
+} from '@mui/material';
+import fileDownload from 'js-file-download';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocalStorage } from 'usehooks-ts';
+import PDfDropZone from '../../components/PDfDropZone';
+import signFile from '../../resources/singFile';
+import singFileInLote from '../../resources/singFileInLote';
+import getGovBrUri, { GetGovBrUriScope } from '../../utils/getGovBrUri';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
 
-  const code = searchParams.get("code");
+  const code = searchParams.get('code');
 
   const [loading, setLoading] = useState(false);
 
@@ -33,33 +33,30 @@ const Home: React.FC = () => {
 
   // scope é o que define se a assunatura do certificado será em lote ou normal.
   const [scope, setScope] = useLocalStorage<GetGovBrUriScope>(
-    "@govbr-signature-integration-front:scope",
-    "sign"
+    '@govbr-signature-integration-front:scope',
+    'sign'
   );
 
   const handleSubmit = async () => {
     if (code) {
-      const inLote = scope === "signature_session";
+      const inLote = scope === 'signature_session';
 
       const signPdfsPromise = inLote
         ? singFileInLote({ pdfs: files, code })
-        : signFile({
-            pdf: files[0],
-            code,
-          });
+        : signFile({ pdf: files[0], code });
 
       setLoading(true);
 
       const { data } = await toast.promise(signPdfsPromise, {
-        loading: "Enviando",
-        success: "Arquivo gerado com sucessor",
-        error: "Algo de errado aconteceu",
+        loading: 'Enviando',
+        success: 'Arquivo gerado com sucessor',
+        error: 'Algo de errado aconteceu',
       });
 
       setCodeWasUsed(true);
       setLoading(false);
 
-      const outputNameFile = inLote ? "lote.zip" : files[0].name;
+      const outputNameFile = inLote ? 'lote.zip' : files[0].name;
 
       fileDownload(data, outputNameFile);
     }
@@ -68,10 +65,10 @@ const Home: React.FC = () => {
   return (
     <Box
       sx={{
-        display: "flex",
-        alignItems: "center",
-        width: "100%",
-        height: "100vh",
+        display: 'flex',
+        alignItems: 'center',
+        width: '100%',
+        height: '100vh',
         backgroundColor: (theme) => theme.palette.background.default,
       }}
     >
@@ -82,7 +79,7 @@ const Home: React.FC = () => {
             <PDfDropZone
               files={files}
               setFiles={setFiles}
-              multiple={scope === "signature_session"}
+              multiple={scope === 'signature_session'}
             />
             <Button
               variant="contained"
@@ -93,7 +90,7 @@ const Home: React.FC = () => {
             </Button>
             <Button
               variant="outlined"
-              onClick={() => navigate("/")}
+              onClick={() => navigate('/')}
               startIcon={<ChevronLeftIcon />}
             >
               Voltar
@@ -108,8 +105,8 @@ const Home: React.FC = () => {
             >
               <Link
                 variant="button"
-                href={getGovBrUri("sign")}
-                onClick={() => setScope("sign")}
+                href={getGovBrUri('sign')}
+                onClick={() => setScope('sign')}
               >
                 Assinar um arquivo
               </Link>
@@ -121,8 +118,8 @@ const Home: React.FC = () => {
             >
               <Link
                 variant="button"
-                href={getGovBrUri("signature_session")}
-                onClick={() => setScope("signature_session")}
+                href={getGovBrUri('signature_session')}
+                onClick={() => setScope('signature_session')}
               >
                 Assinar arquivos em Lote
               </Link>
