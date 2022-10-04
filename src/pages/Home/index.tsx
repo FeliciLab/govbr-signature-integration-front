@@ -1,8 +1,15 @@
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import { Box, Button, Container, Link, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Container,
+  Link,
+  Stack,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import fileDownload from "js-file-download";
 import React, { useState } from "react";
-import { useDropzone } from "react-dropzone";
 import toast from "react-hot-toast";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useLocalStorage } from "usehooks-ts";
@@ -94,20 +101,32 @@ const Home: React.FC = () => {
           </Stack>
         ) : (
           <Stack spacing={2}>
-            <Link
-              variant="button"
-              href={getGovBrUri("sign")}
-              onClick={() => setScope("sign")}
+            <Tooltip
+              title="Selecionar um arquivo para ser assinado"
+              placement="top-start"
+              arrow
             >
-              Assinar um arquivo
-            </Link>
-            <Link
-              variant="button"
-              href={getGovBrUri("signature_session")}
-              onClick={() => setScope("signature_session")}
+              <Link
+                variant="button"
+                href={getGovBrUri("sign")}
+                onClick={() => setScope("sign")}
+              >
+                Assinar um arquivo
+              </Link>
+            </Tooltip>
+            <Tooltip
+              title="Selecionar vários arquivos para serem assinados"
+              placement="top-start"
+              arrow
             >
-              Assinar arquivos em Lote
-            </Link>
+              <Link
+                variant="button"
+                href={getGovBrUri("signature_session")}
+                onClick={() => setScope("signature_session")}
+              >
+                Assinar arquivos em Lote
+              </Link>
+            </Tooltip>
           </Stack>
         )}
       </Container>
