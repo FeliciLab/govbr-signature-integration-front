@@ -1,6 +1,6 @@
-import { IconButton, Box, Typography } from '@mui/material';
-import React from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { Box, IconButton, Typography } from '@mui/material';
+import React from 'react';
 
 interface FilesListProps {
   files: File[];

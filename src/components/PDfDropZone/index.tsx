@@ -1,10 +1,10 @@
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import { Paper, Typography, useTheme, Button } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { Button, Paper, Typography, useTheme } from '@mui/material';
 import { Stack } from '@mui/system';
 import React from 'react';
 import { useDropzone } from 'react-dropzone';
 import FilesList from '../FilesList';
-import DeleteIcon from '@mui/icons-material/Delete';
 
 interface PDfDropZoneProps {
   files: File[];

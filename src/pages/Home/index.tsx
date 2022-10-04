@@ -9,7 +9,7 @@ import {
   Typography,
 } from '@mui/material';
 import fileDownload from 'js-file-download';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useLocalStorage } from 'usehooks-ts';
