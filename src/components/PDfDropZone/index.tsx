@@ -1,30 +1,45 @@
-import { Paper, Typography, useTheme } from "@mui/material";
-import React from "react";
-import { DropzoneInputProps, DropzoneRootProps } from "react-dropzone";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import { green, grey } from "@mui/material/colors";
+import { Paper, Typography, useTheme, Button } from "@mui/material";
 import { Stack } from "@mui/system";
+import React from "react";
+import { useDropzone } from "react-dropzone";
+import FilesList from "../FilesList";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 interface PDfDropZoneProps {
-  acceptedFiles: File[];
-  getRootProps: <T extends DropzoneRootProps>(props?: T) => T;
-  getInputProps: <T extends DropzoneInputProps>(props?: T) => T;
+  files: File[];
+  setFiles: React.Dispatch<React.SetStateAction<File[]>>;
+  multiple: boolean;
 }
 
 const PDfDropZone: React.FC<PDfDropZoneProps> = ({
-  acceptedFiles,
-  getInputProps,
-  getRootProps,
+  files,
+  setFiles,
+  multiple,
 }) => {
   const { palette } = useTheme();
 
-  const FilesList = () => (
-    <ul>
-      {acceptedFiles.map((file) => (
-        <li key={file.name}>{file.name}</li>
-      ))}
-    </ul>
-  );
+  const onDrop = (acceptedFiles: File[]) => {
+    setFiles([...files, ...acceptedFiles]);
+  };
+
+  const removeFile = (file: File) => {
+    const newFiles = [...files];
+    newFiles.splice(newFiles.indexOf(file), 1);
+    setFiles(newFiles);
+  };
+
+  const removeAllFiles = () => {
+    setFiles([]);
+  };
+
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: {
+      "application/pdf": [".pdf"],
+    },
+    multiple,
+    onDrop,
+  });
 
   return (
     <Paper
@@ -44,7 +59,21 @@ const PDfDropZone: React.FC<PDfDropZoneProps> = ({
           arquivos
         </Typography>
       </Stack>
-      <FilesList />
+      <Typography variant="h6">Arquivos selecionados</Typography>
+      {files.length > 0 ? (
+        <>
+          <FilesList files={files} removeFile={removeFile} />
+          <Button
+            onClick={removeAllFiles}
+            color="warning"
+            startIcon={<DeleteIcon />}
+          >
+            Remove todos
+          </Button>
+        </>
+      ) : (
+        <Typography>Nenhum arquivo selecionado</Typography>
+      )}
     </Paper>
   );
 };

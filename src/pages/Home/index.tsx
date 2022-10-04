@@ -22,27 +22,22 @@ const Home: React.FC = () => {
 
   const [codeWasUsed, setCodeWasUsed] = useState(false);
 
+  const [files, setFiles] = useState<File[]>([]);
+
   // scope é o que define se a assunatura do certificado será em lote ou normal.
   const [scope, setScope] = useLocalStorage<GetGovBrUriScope>(
     "@govbr-signature-integration-front:scope",
     "sign"
   );
 
-  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
-    accept: {
-      "application/pdf": [".pdf"],
-    },
-    multiple: scope === "signature_session",
-  });
-
   const handleSubmit = async () => {
     if (code) {
       const inLote = scope === "signature_session";
 
       const signPdfsPromise = inLote
-        ? singFileInLote({ pdfs: acceptedFiles, code })
+        ? singFileInLote({ pdfs: files, code })
         : signFile({
-            pdf: acceptedFiles[0],
+            pdf: files[0],
             code,
           });
 
@@ -57,7 +52,7 @@ const Home: React.FC = () => {
       setCodeWasUsed(true);
       setLoading(false);
 
-      const outputNameFile = inLote ? "lote.zip" : acceptedFiles[0].name;
+      const outputNameFile = inLote ? "lote.zip" : files[0].name;
 
       fileDownload(data, outputNameFile);
     }
@@ -78,9 +73,9 @@ const Home: React.FC = () => {
         {code ? (
           <Stack spacing={2}>
             <PDfDropZone
-              acceptedFiles={acceptedFiles}
-              getInputProps={getInputProps}
-              getRootProps={getRootProps}
+              files={files}
+              setFiles={setFiles}
+              multiple={scope === "signature_session"}
             />
             <Button
               variant="contained"
