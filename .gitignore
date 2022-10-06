@@ -9,6 +9,7 @@ lerna-debug.log*
 
 # Environments variables
 .env
+.markdownlint.json
 
 node_modules
 dist
