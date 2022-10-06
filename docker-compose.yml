@@ -1,0 +1,7 @@
+version: "3.8"
+services:
+    assinador-front:
+      build: .
+      container_name: assinador-front
+      ports:
+        - '8080:3000'
