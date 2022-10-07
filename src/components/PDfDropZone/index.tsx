@@ -1,6 +1,6 @@
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Button, Paper, Typography, useTheme } from '@mui/material';
+import { Box, Button, Paper, Typography, useTheme } from '@mui/material';
 import { Stack } from '@mui/system';
 import React from 'react';
 import { useDropzone } from 'react-dropzone';
@@ -61,16 +61,28 @@ const PDfDropZone: React.FC<PDfDropZoneProps> = ({
       </Stack>
       <Typography variant="h6">Arquivos selecionados</Typography>
       {files.length > 0 ? (
-        <>
+        <Box>
           <FilesList files={files} removeFile={removeFile} />
-          <Button
-            onClick={removeAllFiles}
-            color="warning"
-            startIcon={<DeleteIcon />}
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginTop: 2,
+            }}
           >
-            Remove todos
-          </Button>
-        </>
+            <Button
+              onClick={removeAllFiles}
+              color="warning"
+              startIcon={<DeleteIcon />}
+            >
+              Remove todos
+            </Button>
+            <Typography variant="subtitle1">
+              Quantidade: {files.length}
+            </Typography>
+          </Box>
+        </Box>
       ) : (
         <Typography>Nenhum arquivo selecionado</Typography>
       )}
