@@ -3,9 +3,14 @@ import api from '../api';
 interface SingFileInLoteProps {
   pdfs: File[];
   code: string;
+  onUploadProgress?: (progressEvent: ProgressEvent) => void;
 }
 
-const signFileInLote = ({ pdfs, code }: SingFileInLoteProps) => {
+const signFileInLote = ({
+  pdfs,
+  code,
+  onUploadProgress,
+}: SingFileInLoteProps) => {
   const mulPartFormData = new FormData();
 
   for (let index = 0; index < pdfs.length; index++) {
@@ -18,6 +23,7 @@ const signFileInLote = ({ pdfs, code }: SingFileInLoteProps) => {
       Accept: 'application/zip',
     },
     responseType: 'blob',
+    onUploadProgress,
   });
 };
 

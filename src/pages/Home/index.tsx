@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Container,
+  LinearProgress,
   Link,
   Stack,
   Tooltip,
@@ -27,6 +28,8 @@ const Home: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
 
+  const [uploadProgress, setUploadProgress] = useState(0);
+
   const [codeWasUsed, setCodeWasUsed] = useState(false);
 
   const [files, setFiles] = useState<File[]>([]);
@@ -37,18 +40,32 @@ const Home: React.FC = () => {
     'sign'
   );
 
+  const onUploadProgress = (progressEvent: ProgressEvent) => {
+    setUploadProgress(
+      Math.round((progressEvent.loaded * 100) / progressEvent.total)
+    );
+  };
+
   const handleSubmit = async () => {
     if (code) {
       const inLote = scope === 'signature_session';
 
       const signPdfsPromise = inLote
-        ? singFileInLote({ pdfs: files, code })
-        : signFile({ pdf: files[0], code });
+        ? singFileInLote({
+            pdfs: files,
+            code,
+            onUploadProgress,
+          })
+        : signFile({
+            pdf: files[0],
+            code,
+            onUploadProgress,
+          });
 
       setLoading(true);
 
       const { data } = await toast.promise(signPdfsPromise, {
-        loading: 'Enviando',
+        loading: 'Assinando arquivos',
         success: 'Arquivo gerado com sucessor',
         error: 'Algo de errado aconteceu',
       });
@@ -76,6 +93,12 @@ const Home: React.FC = () => {
         <Typography variant="h4">Assinador</Typography>
         {code ? (
           <Stack spacing={2}>
+            {uploadProgress > 0 && (
+              <Box>
+                <LinearProgress variant="determinate" value={uploadProgress} />
+                <Typography>Progresso de upload: {uploadProgress}%</Typography>
+              </Box>
+            )}
             <PDfDropZone
               files={files}
               setFiles={setFiles}

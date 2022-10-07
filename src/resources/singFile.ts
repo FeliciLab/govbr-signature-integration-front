@@ -3,9 +3,10 @@ import api from '../api';
 interface SingFileProps {
   pdf: File;
   code: string;
+  onUploadProgress?: (progressEvent: ProgressEvent) => void;
 }
 
-const singFile = ({ pdf, code }: SingFileProps) => {
+const singFile = ({ pdf, code, onUploadProgress }: SingFileProps) => {
   const mulPartFormData = new FormData();
 
   mulPartFormData.append('pdf', pdf);
@@ -16,6 +17,7 @@ const singFile = ({ pdf, code }: SingFileProps) => {
       Accept: 'application/pdf',
     },
     responseType: 'blob',
+    onUploadProgress,
   });
 };
 
