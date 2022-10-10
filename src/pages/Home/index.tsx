@@ -10,7 +10,7 @@ import {
   Typography,
 } from '@mui/material';
 import fileDownload from 'js-file-download';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useLocalStorage } from 'usehooks-ts';
@@ -33,6 +33,52 @@ const Home: React.FC = () => {
   const [codeWasUsed, setCodeWasUsed] = useState(false);
 
   const [files, setFiles] = useState<File[]>([]);
+
+  const [externalPopup, setExternalPopup] = useState<Window | null>(null);
+
+  const connectClick = () => {
+    const widthPopup = 800;
+    const heightPopup = 800;
+    const left = window.screenX + (window.outerWidth - widthPopup) / 2;
+    const top = window.screenY + (window.outerHeight - heightPopup) / 2.5;
+    const title = `WINDOW TITLE`;
+    const url = getGovBrUri('sign');
+    const popup = window.open(
+      url,
+      title,
+      `width=${widthPopup},height=${heightPopup},left=${left},top=${top}`
+    );
+    setExternalPopup(popup);
+  };
+
+  useEffect(() => {
+    if (!externalPopup) {
+      return;
+    }
+
+    const timer = setInterval(() => {
+      if (!externalPopup) {
+        timer && clearInterval(timer);
+        return;
+      }
+
+      const currentUrl = externalPopup.location.href;
+
+      if (!currentUrl) {
+        return;
+      }
+
+      const searchParams = new URL(currentUrl).searchParams;
+
+      const code = searchParams.get('code');
+      if (code) {
+        externalPopup.close();
+        console.log(`The popup URL has URL code param = ${code}`);
+
+        handleSubmit();
+      }
+    }, 500);
+  }, [externalPopup]);
 
   // scope é o que define se a assunatura do certificado será em lote ou normal.
   const [scope, setScope] = useLocalStorage<GetGovBrUriScope>(
@@ -121,6 +167,7 @@ const Home: React.FC = () => {
           </Stack>
         ) : (
           <Stack spacing={2}>
+            <Button onClick={connectClick}>Teste</Button>
             <Tooltip
               title="Selecionar um arquivo para ser assinado"
               placement="top-start"
