@@ -72,6 +72,8 @@ const Home: React.FC = () => {
 
   const handleSubmit = async (code: string) => {
     if (code) {
+      setUploadProgress(0);
+
       const inLote = files.length > 1;
 
       const signPdfsPromise = inLote
