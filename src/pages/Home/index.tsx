@@ -7,7 +7,7 @@ import {
   Typography,
 } from '@mui/material';
 import fileDownload from 'js-file-download';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import PDfDropZone from '../../components/PDfDropZone';
 import signFile from '../../resources/singFile';
@@ -23,14 +23,14 @@ const Home: React.FC = () => {
 
   const [externalPopup, setExternalPopup] = useState<Window | null>(null);
 
-  const connectClick = () => {
-    const inLote = files.length > 1;
+  const inLote = useMemo(() => files.length > 1, [files]);
 
+  const connectClick = () => {
     const widthPopup = 800;
     const heightPopup = 800;
     const left = window.screenX + (window.outerWidth - widthPopup) / 2;
     const top = window.screenY + (window.outerHeight - heightPopup) / 2.5;
-    const title = `WINDOW TITLE`;
+    const title = 'Atenticação com Gov.BR';
     const url = getGovBrUri(inLote ? 'signature_session' : 'sign');
     const popup = window.open(
       url,
@@ -39,33 +39,6 @@ const Home: React.FC = () => {
     );
     setExternalPopup(popup);
   };
-
-  useEffect(() => {
-    if (!externalPopup) {
-      return;
-    }
-
-    const timer = setInterval(() => {
-      if (!externalPopup) {
-        timer && clearInterval(timer);
-        return;
-      }
-
-      const currentUrl = externalPopup.location.href;
-
-      if (!currentUrl) {
-        return;
-      }
-      const searchParams = new URL(currentUrl).searchParams;
-
-      const code = searchParams.get('code');
-
-      if (code) {
-        externalPopup.close();
-        handleSubmit(code);
-      }
-    }, 500);
-  }, [externalPopup]);
 
   const onUploadProgress = (progressEvent: ProgressEvent) => {
     setUploadProgress(
@@ -76,8 +49,6 @@ const Home: React.FC = () => {
   const handleSubmit = async (code: string) => {
     if (code) {
       setUploadProgress(0);
-
-      const inLote = files.length > 1;
 
       const signPdfsPromise = inLote
         ? singFileInLote({
@@ -106,6 +77,31 @@ const Home: React.FC = () => {
       fileDownload(data, outputNameFile);
     }
   };
+
+  useEffect(() => {
+    if (externalPopup) {
+      const timer = setInterval(() => {
+        if (!externalPopup) {
+          timer && clearInterval(timer);
+          return;
+        }
+
+        const currentUrl = externalPopup.location.href;
+
+        if (!currentUrl) {
+          return;
+        }
+        const searchParams = new URL(currentUrl).searchParams;
+
+        const code = searchParams.get('code');
+
+        if (code) {
+          externalPopup.close();
+          handleSubmit(code);
+        }
+      }, 500);
+    }
+  }, [externalPopup]);
 
   return (
     <Box
