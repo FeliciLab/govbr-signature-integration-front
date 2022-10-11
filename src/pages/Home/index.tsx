@@ -50,15 +50,18 @@ const Home: React.FC = () => {
         timer && clearInterval(timer);
         return;
       }
+
       const currentUrl = externalPopup.location.href;
+
       if (!currentUrl) {
         return;
       }
       const searchParams = new URL(currentUrl).searchParams;
+
       const code = searchParams.get('code');
+
       if (code) {
         externalPopup.close();
-        console.log(`The popup URL has URL code param = ${code}`);
         handleSubmit(code);
       }
     }, 500);
