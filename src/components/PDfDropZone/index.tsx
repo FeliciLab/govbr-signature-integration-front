@@ -1,6 +1,6 @@
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Box, Button, Paper, Typography, useTheme } from '@mui/material';
+import { Box, Button, Typography, useTheme } from '@mui/material';
 import { Stack } from '@mui/system';
 import React from 'react';
 import { useDropzone } from 'react-dropzone';
@@ -42,24 +42,28 @@ const PDfDropZone: React.FC<PDfDropZoneProps> = ({
   });
 
   return (
-    <Paper
-      elevation={0}
-      sx={{
-        padding: 2,
-        border: 2,
-        borderStyle: 'dashed',
-        borderColor: palette.primary.main,
-      }}
-    >
-      <Stack alignItems="center" {...getRootProps()}>
+    <Box>
+      <Stack
+        alignItems="center"
+        sx={{
+          padding: 2,
+          border: 2,
+          borderStyle: 'dashed',
+          backgroundColor: '#F5F5F5',
+          borderColor: palette.primary.main,
+        }}
+        {...getRootProps()}
+      >
         <input {...getInputProps()} />
         <CloudUploadIcon fontSize="large" />
         <Typography variant="body1" style={{ textAlign: 'center' }}>
-          Arraste e solte alguns arquivos aqui ou clique para selecionar os
-          arquivos
+          Clique aqui ou arraste e solte os arquivos de certificados em formato
+          PDF
         </Typography>
       </Stack>
-      <Typography variant="h6">Arquivos selecionados</Typography>
+      <Typography variant="h6" mt={1} sx={{ fontWeight: 500 }}>
+        Arquivos selecionados
+      </Typography>
       {files.length > 0 ? (
         <Box>
           <FilesList files={files} removeFile={removeFile} />
@@ -84,9 +88,9 @@ const PDfDropZone: React.FC<PDfDropZoneProps> = ({
           </Box>
         </Box>
       ) : (
-        <Typography>Nenhum arquivo selecionado</Typography>
+        <Typography variant="body1">Nenhum arquivo selecionado</Typography>
       )}
-    </Paper>
+    </Box>
   );
 };
 

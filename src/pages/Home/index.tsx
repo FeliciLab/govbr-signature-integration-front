@@ -1,6 +1,9 @@
 import {
   Box,
   Button,
+  Card,
+  CardActions,
+  CardContent,
   Container,
   LinearProgress,
   Stack,
@@ -99,7 +102,7 @@ const Home: React.FC = () => {
           externalPopup.close();
           handleSubmit(code);
         }
-      }, 500);
+      }, 200);
     }
   }, [externalPopup]);
 
@@ -114,23 +117,41 @@ const Home: React.FC = () => {
       }}
     >
       <Container maxWidth="sm">
-        <Typography variant="h4">Assinador</Typography>
-        <Stack spacing={2}>
-          {uploadProgress > 0 && (
-            <Box>
-              <LinearProgress variant="determinate" value={uploadProgress} />
-              <Typography>Progresso de upload: {uploadProgress}%</Typography>
-            </Box>
-          )}
-          <PDfDropZone files={files} setFiles={setFiles} multiple />
-          <Button
-            variant="contained"
-            onClick={connectClick}
-            disabled={loading || files.length <= 0}
-          >
-            Enviar
-          </Button>
-        </Stack>
+        <Card elevation={0}>
+          <CardContent>
+            <Typography variant="h4" fontWeight={500}>
+              Assinador de certificados
+            </Typography>
+            <ol>
+              <Typography component="li">
+                Selecione arquivos de certifcados em PDF;
+              </Typography>
+              <Typography component="li">
+                Realize a assinatura com GovBr;
+              </Typography>
+              <Typography component="li">
+                Baixe e envie os arquivos assinados.
+              </Typography>
+            </ol>
+            <PDfDropZone files={files} setFiles={setFiles} multiple />
+            {uploadProgress > 0 && (
+              <Box mt={2}>
+                <LinearProgress variant="determinate" value={uploadProgress} />
+                <Typography>Progresso de upload: {uploadProgress}%</Typography>
+              </Box>
+            )}
+          </CardContent>
+          <CardActions>
+            <Button
+              fullWidth
+              variant="contained"
+              onClick={connectClick}
+              disabled={loading || files.length <= 0}
+            >
+              Assinar com GovBr
+            </Button>
+          </CardActions>
+        </Card>
       </Container>
     </Box>
   );

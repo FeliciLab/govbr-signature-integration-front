@@ -6,7 +6,7 @@ const theme = createTheme({
     primary: {
       main: green[700],
     },
-    background: { default: grey[200], paper: grey[300] },
+    background: { default: '#CACACA', paper: '#fff' },
   },
 });
 
