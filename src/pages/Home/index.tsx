@@ -103,11 +103,10 @@ const Home: React.FC = () => {
     }
   }, [externalPopup]);
 
-  const isAuthenticated = () => {
-    const token = new URL(window.location.href).searchParams.get('q');
-
-    return (token == import.meta.env.VITE_ESPCE_TOKEN);
-  };
+  // const isAuthenticated = () => {
+  //   const token = new URL(window.location.href).searchParams.get('q');
+  //   return (token == import.meta.env.VITE_ESPCE_TOKEN);
+  // };
 
   return (
     <Box
@@ -119,27 +118,27 @@ const Home: React.FC = () => {
         backgroundColor: (theme) => theme.palette.background.default,
       }}
     >
-    {isAuthenticated() && (
+      {/* {isAuthenticated() && ( */}
       <Container maxWidth="sm">
         <Typography variant="h4">Assinador</Typography>
-          <Stack spacing={2}>
-            {uploadProgress > 0 && (
-              <Box>
-                <LinearProgress variant="determinate" value={uploadProgress} />
-                <Typography>Progresso de upload: {uploadProgress}%</Typography>
-              </Box>
-            )}
-            <PDfDropZone files={files} setFiles={setFiles} multiple />
-            <Button
-              variant="contained"
-              onClick={connectClick}
-              disabled={loading || files.length <= 0}
-            >
-              Enviar
-            </Button>
-          </Stack>
+        <Stack spacing={2}>
+          {uploadProgress > 0 && (
+            <Box>
+              <LinearProgress variant="determinate" value={uploadProgress} />
+              <Typography>Progresso de upload: {uploadProgress}%</Typography>
+            </Box>
+          )}
+          <PDfDropZone files={files} setFiles={setFiles} multiple />
+          <Button
+            variant="contained"
+            onClick={connectClick}
+            disabled={loading || files.length <= 0}
+          >
+            Enviar
+          </Button>
+        </Stack>
       </Container>
-    )}
+      {/* )} */}
     </Box>
   );
 };
