@@ -104,11 +104,6 @@ const Home: React.FC = () => {
     }
   }, [externalPopup]);
 
-  // const isAuthenticated = () => {
-  //   const token = new URL(window.location.href).searchParams.get('q');
-  //   return (token == import.meta.env.VITE_ESPCE_TOKEN);
-  // };
-
   return (
     <Box
       sx={{
@@ -119,7 +114,6 @@ const Home: React.FC = () => {
         backgroundColor: (theme) => theme.palette.background.default,
       }}
     >
-      {/* {isAuthenticated() && ( */}
       <Container maxWidth="sm">
         <Typography variant="h4">Assinador</Typography>
         <UserInfos />
@@ -140,7 +134,6 @@ const Home: React.FC = () => {
           </Button>
         </Stack>
       </Container>
-      {/* )} */}
     </Box>
   );
 };
