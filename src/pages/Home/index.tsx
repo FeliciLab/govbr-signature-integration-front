@@ -10,6 +10,7 @@ import fileDownload from 'js-file-download';
 import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import PDfDropZone from '../../components/PDfDropZone';
+import UserInfos from '../../components/UserInfos';
 import signFile from '../../resources/singFile';
 import singFileInLote from '../../resources/singFileInLote';
 import getGovBrUri from '../../utils/getGovBrUri';
@@ -103,12 +104,6 @@ const Home: React.FC = () => {
     }
   }, [externalPopup]);
 
-  const isAuthenticated = () => {
-    const token = new URL(window.location.href).searchParams.get('q');
-
-    return (token == import.meta.env.VITE_ESPCE_TOKEN);
-  };
-
   return (
     <Box
       sx={{
@@ -119,27 +114,26 @@ const Home: React.FC = () => {
         backgroundColor: (theme) => theme.palette.background.default,
       }}
     >
-    {isAuthenticated() && (
       <Container maxWidth="sm">
         <Typography variant="h4">Assinador</Typography>
-          <Stack spacing={2}>
-            {uploadProgress > 0 && (
-              <Box>
-                <LinearProgress variant="determinate" value={uploadProgress} />
-                <Typography>Progresso de upload: {uploadProgress}%</Typography>
-              </Box>
-            )}
-            <PDfDropZone files={files} setFiles={setFiles} multiple />
-            <Button
-              variant="contained"
-              onClick={connectClick}
-              disabled={loading || files.length <= 0}
-            >
-              Enviar
-            </Button>
-          </Stack>
+        <UserInfos />
+        <Stack spacing={2}>
+          {uploadProgress > 0 && (
+            <Box>
+              <LinearProgress variant="determinate" value={uploadProgress} />
+              <Typography>Progresso de upload: {uploadProgress}%</Typography>
+            </Box>
+          )}
+          <PDfDropZone files={files} setFiles={setFiles} multiple />
+          <Button
+            variant="contained"
+            onClick={connectClick}
+            disabled={loading || files.length <= 0}
+          >
+            Enviar
+          </Button>
+        </Stack>
       </Container>
-    )}
     </Box>
   );
 };
