@@ -10,6 +10,7 @@ import fileDownload from 'js-file-download';
 import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import PDfDropZone from '../../components/PDfDropZone';
+import UserInfos from '../../components/UserInfos';
 import signFile from '../../resources/singFile';
 import singFileInLote from '../../resources/singFileInLote';
 import getGovBrUri from '../../utils/getGovBrUri';
@@ -121,6 +122,7 @@ const Home: React.FC = () => {
       {/* {isAuthenticated() && ( */}
       <Container maxWidth="sm">
         <Typography variant="h4">Assinador</Typography>
+        <UserInfos />
         <Stack spacing={2}>
           {uploadProgress > 0 && (
             <Box>
