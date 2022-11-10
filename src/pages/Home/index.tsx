@@ -48,34 +48,39 @@ const Home: React.FC = () => {
   };
 
   const handleSubmit = async (code: string) => {
-    if (code) {
-      setUploadProgress(0);
-
-      const signPdfsPromise = inLote
-        ? singFileInLote({
-            pdfs: files,
-            code,
-            onUploadProgress,
-          })
-        : signFile({
-            pdf: files[0],
-            code,
-            onUploadProgress,
-          });
-
+    try {
       setLoading(true);
 
-      const { data } = await toast.promise(signPdfsPromise, {
-        loading: 'Assinando arquivos',
-        success: 'Arquivo gerado com sucessor',
-        error: 'Algo de errado aconteceu',
-      });
+      if (code) {
+        setUploadProgress(0);
 
+        const signPdfsPromise = inLote
+          ? singFileInLote({
+              pdfs: files,
+              code,
+              onUploadProgress,
+            })
+          : signFile({
+              pdf: files[0],
+              code,
+              onUploadProgress,
+            });
+
+        const { data } = await toast.promise(signPdfsPromise, {
+          loading: 'Assinando arquivos',
+          success: 'Arquivo gerado com sucesso',
+          error: 'Algo de errado aconteceu ',
+        });
+
+        const outputNameFile = inLote ? 'lote.zip' : files[0].name;
+
+        fileDownload(data, outputNameFile);
+      }
+    } catch (error) {
+      // TODO: setar aqui o tipo de erro em um state
+      console.log(JSON.stringify(error, null, 2));
+    } finally {
       setLoading(false);
-
-      const outputNameFile = inLote ? 'lote.zip' : files[0].name;
-
-      fileDownload(data, outputNameFile);
     }
   };
 

@@ -14,7 +14,7 @@ const singFile = ({ pdf, code, onUploadProgress }: SingFileProps) => {
   return api.post(`/signPdf/${code}`, mulPartFormData, {
     headers: {
       'content-type': 'multipart/form-data;',
-      Accept: 'application/pdf',
+      Accept: 'application/pdf, application/json',
     },
     responseType: 'blob',
     onUploadProgress,

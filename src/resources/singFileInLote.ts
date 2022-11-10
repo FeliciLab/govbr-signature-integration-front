@@ -20,7 +20,7 @@ const signFileInLote = ({
   return api.post(`/signPdf/lote/${code}`, mulPartFormData, {
     headers: {
       'content-type': 'multipart/form-data;',
-      Accept: 'application/zip',
+      Accept: 'application/zip, application/json',
     },
     responseType: 'blob',
     onUploadProgress,
