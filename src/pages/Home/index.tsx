@@ -6,6 +6,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
+import { AxiosError } from 'axios';
 import fileDownload from 'js-file-download';
 import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -77,8 +78,10 @@ const Home: React.FC = () => {
         fileDownload(data, outputNameFile);
       }
     } catch (error) {
-      // TODO: setar aqui o tipo de erro em um state
-      console.log(JSON.stringify(error, null, 2));
+      if (error instanceof AxiosError) {
+        // TODO: setar aqui o tipo de erro em um state
+        console.log(JSON.stringify(error, null, 2));
+      }
     } finally {
       setLoading(false);
     }
