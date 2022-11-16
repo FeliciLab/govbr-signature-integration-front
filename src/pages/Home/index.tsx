@@ -6,7 +6,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { AxiosError } from 'axios';
+import axios from 'axios';
 import fileDownload from 'js-file-download';
 import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -20,6 +20,8 @@ const Home: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   const [uploadProgress, setUploadProgress] = useState(0);
+
+  const [messageError, setMessageError] = useState<null | string>(null);
 
   const [files, setFiles] = useState<File[]>([]);
 
@@ -51,6 +53,7 @@ const Home: React.FC = () => {
   const handleSubmit = async (code: string) => {
     try {
       setLoading(true);
+      setMessageError(null);
 
       if (code) {
         setUploadProgress(0);
@@ -78,9 +81,19 @@ const Home: React.FC = () => {
         fileDownload(data, outputNameFile);
       }
     } catch (error) {
-      if (error instanceof AxiosError) {
+      if (axios.isAxiosError(error)) {
         // TODO: setar aqui o tipo de erro em um state
-        console.log(JSON.stringify(error, null, 2));
+        console.log('is blob:', error.response?.data instanceof Blob);
+
+        if (error.response?.data instanceof Blob) {
+          const dataJson = await error.response?.data.text();
+
+          const errorResponseData = await JSON.parse(dataJson);
+
+          setMessageError(errorResponseData.message);
+        }
+
+        console.log(JSON.stringify(error.response?.data, null, 2));
       }
     } finally {
       setLoading(false);
@@ -124,6 +137,7 @@ const Home: React.FC = () => {
     >
       <Container maxWidth="sm">
         <Typography variant="h4">Assinador</Typography>
+        {messageError && <Typography>{messageError}</Typography>}
         <UserInfos />
         <Stack spacing={2}>
           {uploadProgress > 0 && (
