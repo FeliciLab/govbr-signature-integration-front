@@ -1,4 +1,5 @@
-import { api } from '../api';
+import { AxiosResponse } from 'axios';
+import { api, ApiError } from '../api';
 
 interface SingFileInLoteProps {
   pdfs: File[];
@@ -10,7 +11,7 @@ const signFileInLote = ({
   pdfs,
   code,
   onUploadProgress,
-}: SingFileInLoteProps) => {
+}: SingFileInLoteProps): Promise<AxiosResponse<Blob, ApiError>> => {
   const mulPartFormData = new FormData();
 
   for (let index = 0; index < pdfs.length; index++) {

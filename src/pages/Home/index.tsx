@@ -10,6 +10,8 @@ import axios from 'axios';
 import fileDownload from 'js-file-download';
 import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
+import { ApiError } from '../../api';
+import ErrorCard, { ErrorCardProps } from '../../components/ErrorCard';
 import PDfDropZone from '../../components/PDfDropZone';
 import UserInfos from '../../components/UserInfos';
 import signFile from '../../resources/singFile';
@@ -21,7 +23,8 @@ const Home: React.FC = () => {
 
   const [uploadProgress, setUploadProgress] = useState(0);
 
-  const [messageError, setMessageError] = useState<null | string>(null);
+  const [errorCardPropsInstance, setErrorCardPropsInstance] =
+    useState<ErrorCardProps>();
 
   const [files, setFiles] = useState<File[]>([]);
 
@@ -53,7 +56,7 @@ const Home: React.FC = () => {
   const handleSubmit = async (code: string) => {
     try {
       setLoading(true);
-      setMessageError(null);
+      setErrorCardPropsInstance(undefined);
 
       if (code) {
         setUploadProgress(0);
@@ -82,18 +85,21 @@ const Home: React.FC = () => {
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        // TODO: setar aqui o tipo de erro em um state
-        console.log('is blob:', error.response?.data instanceof Blob);
+        if (
+          error.response?.data instanceof Blob &&
+          error.response.status === 403
+        ) {
+          const dataJson = await error.response.data.text();
 
-        if (error.response?.data instanceof Blob) {
-          const dataJson = await error.response?.data.text();
+          const errorResponseData = (await JSON.parse(dataJson)) as ApiError;
 
-          const errorResponseData = await JSON.parse(dataJson);
-
-          setMessageError(errorResponseData.message);
+          setErrorCardPropsInstance({
+            title: 'Ação não permitida',
+            message: errorResponseData.message,
+            action: () => console.log('Testando setErrorCardAction'),
+            actionLabel: 'Acessar o gov.br',
+          });
         }
-
-        console.log(JSON.stringify(error.response?.data, null, 2));
       }
     } finally {
       setLoading(false);
@@ -136,10 +142,17 @@ const Home: React.FC = () => {
       }}
     >
       <Container maxWidth="sm">
-        <Typography variant="h4">Assinador</Typography>
-        {messageError && <Typography>{messageError}</Typography>}
-        <UserInfos />
         <Stack spacing={2}>
+          <Typography variant="h4">Assinador</Typography>
+          <UserInfos />
+          {errorCardPropsInstance && (
+            <ErrorCard
+              title={errorCardPropsInstance.title}
+              message={errorCardPropsInstance.message}
+              action={errorCardPropsInstance.action}
+              actionLabel={errorCardPropsInstance.actionLabel}
+            />
+          )}
           {uploadProgress > 0 && (
             <Box>
               <LinearProgress variant="determinate" value={uploadProgress} />
