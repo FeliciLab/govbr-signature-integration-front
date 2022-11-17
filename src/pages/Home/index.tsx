@@ -93,10 +93,13 @@ const Home: React.FC = () => {
 
           const errorResponseData = (await JSON.parse(dataJson)) as ApiError;
 
+          const urlConfiabilidades = import.meta.env
+            .VITE_GOVBR_URL_CONFIABILIDADES;
+
           setErrorCardPropsInstance({
             title: 'Ação não permitida',
             message: errorResponseData.message,
-            action: () => console.log('Testando setErrorCardAction'),
+            action: () => window.open(urlConfiabilidades, '_blank'),
             actionLabel: 'Acessar o gov.br',
           });
         }
