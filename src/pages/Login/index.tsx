@@ -1,7 +1,9 @@
-import { Box, Container, Stack, TextField, Typography } from '@mui/material';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { Box, Button, Container, Stack, Typography } from '@mui/material';
 import React from 'react';
-import { useForm, Controller, SubmitHandler } from 'react-hook-form';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import ControlledTextfield from '../../components/ControlledTextfield';
+import schema from './schema';
 
 interface LoginFormData {
   email: string;
@@ -9,11 +11,12 @@ interface LoginFormData {
 }
 
 const Login: React.FC = () => {
-  const { control } = useForm<LoginFormData>({
+  const { control, handleSubmit } = useForm<LoginFormData>({
     defaultValues: {
       email: '',
       senha: '',
     },
+    resolver: yupResolver(schema),
   });
 
   const onSubmit: SubmitHandler<LoginFormData> = (data) => {
@@ -31,25 +34,28 @@ const Login: React.FC = () => {
       }}
     >
       <Container maxWidth="sm">
-        <Stack spacing={1}>
-          <Typography variant="h4">🔥 Login Assinador 🔥</Typography>
-          <ControlledTextfield
-            control={control}
-            name="email"
-            textFieldProps={{
-              label: 'Email',
-              variant: 'outlined',
-            }}
-          />
-          <ControlledTextfield
-            control={control}
-            name="senha"
-            textFieldProps={{
-              label: 'Senha',
-              variant: 'outlined',
-            }}
-          />
-        </Stack>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Stack spacing={1}>
+            <Typography variant="h4">🔥 Login Assinador 🔥</Typography>
+            <ControlledTextfield
+              control={control}
+              name="email"
+              textFieldProps={{
+                label: 'Email',
+                variant: 'outlined',
+              }}
+            />
+            <ControlledTextfield
+              control={control}
+              name="senha"
+              textFieldProps={{
+                label: 'Senha',
+                variant: 'outlined',
+              }}
+            />
+            <Button type="submit">Acessar</Button>
+          </Stack>
+        </form>
       </Container>
     </Box>
   );
