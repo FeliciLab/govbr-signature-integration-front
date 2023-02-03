@@ -1,66 +1,138 @@
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import {
   Box,
   Button,
   Container,
-  Link,
+  LinearProgress,
   Stack,
-  Tooltip,
   Typography,
 } from '@mui/material';
+import axios from 'axios';
 import fileDownload from 'js-file-download';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useLocalStorage } from 'usehooks-ts';
+import { ApiError } from '../../api';
+import ErrorCard, { ErrorCardProps } from '../../components/ErrorCard';
 import PDfDropZone from '../../components/PDfDropZone';
+import UserInfos from '../../components/UserInfos';
 import signFile from '../../resources/singFile';
 import singFileInLote from '../../resources/singFileInLote';
-import getGovBrUri, { GetGovBrUriScope } from '../../utils/getGovBrUri';
+import getGovBrUri from '../../utils/getGovBrUri';
 
 const Home: React.FC = () => {
-  const navigate = useNavigate();
-
-  const [searchParams] = useSearchParams();
-
-  const code = searchParams.get('code');
-
   const [loading, setLoading] = useState(false);
 
-  const [codeWasUsed, setCodeWasUsed] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  const [errorCardPropsInstance, setErrorCardPropsInstance] =
+    useState<ErrorCardProps>();
 
   const [files, setFiles] = useState<File[]>([]);
 
-  // scope é o que define se a assunatura do certificado será em lote ou normal.
-  const [scope, setScope] = useLocalStorage<GetGovBrUriScope>(
-    '@govbr-signature-integration-front:scope',
-    'sign'
-  );
+  const [externalPopup, setExternalPopup] = useState<Window | null>(null);
 
-  const handleSubmit = async () => {
-    if (code) {
-      const inLote = scope === 'signature_session';
+  const inLote = useMemo(() => files.length > 1, [files]);
 
-      const signPdfsPromise = inLote
-        ? singFileInLote({ pdfs: files, code })
-        : signFile({ pdf: files[0], code });
+  const connectClick = () => {
+    const widthPopup = 800;
+    const heightPopup = 800;
+    const left = window.screenX + (window.outerWidth - widthPopup) / 2;
+    const top = window.screenY + (window.outerHeight - heightPopup) / 2.5;
+    const title = 'Autenticação com Gov.BR';
+    const url = getGovBrUri(inLote ? 'signature_session' : 'sign');
+    const popup = window.open(
+      url,
+      title,
+      `width=${widthPopup},height=${heightPopup},left=${left},top=${top}`
+    );
+    setExternalPopup(popup);
+  };
 
+  const onUploadProgress = (progressEvent: ProgressEvent) => {
+    setUploadProgress(
+      Math.round((progressEvent.loaded * 100) / progressEvent.total)
+    );
+  };
+
+  const handleSubmit = async (code: string) => {
+    try {
       setLoading(true);
+      setErrorCardPropsInstance(undefined);
 
-      const { data } = await toast.promise(signPdfsPromise, {
-        loading: 'Enviando',
-        success: 'Arquivo gerado com sucessor',
-        error: 'Algo de errado aconteceu',
-      });
+      if (code) {
+        setUploadProgress(0);
 
-      setCodeWasUsed(true);
+        const signPdfsPromise = inLote
+          ? singFileInLote({
+              pdfs: files,
+              code,
+              onUploadProgress,
+            })
+          : signFile({
+              pdf: files[0],
+              code,
+              onUploadProgress,
+            });
+
+        const { data } = await toast.promise(signPdfsPromise, {
+          loading: 'Assinando arquivos',
+          success: 'Arquivo gerado com sucesso',
+          error: 'Algo de errado aconteceu ',
+        });
+
+        const outputNameFile = inLote ? 'lote.zip' : files[0].name;
+
+        fileDownload(data, outputNameFile);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        if (
+          error.response?.data instanceof Blob &&
+          error.response.status === 403
+        ) {
+          const dataJson = await error.response.data.text();
+
+          const errorResponseData = (await JSON.parse(dataJson)) as ApiError;
+
+          const urlConfiabilidades = import.meta.env
+            .VITE_GOVBR_URL_CONFIABILIDADES;
+
+          setErrorCardPropsInstance({
+            title: 'Ação não permitida',
+            message: errorResponseData.message,
+            action: () => window.open(urlConfiabilidades, '_blank'),
+            actionLabel: 'Acessar o gov.br',
+          });
+        }
+      }
+    } finally {
       setLoading(false);
-
-      const outputNameFile = inLote ? 'lote.zip' : files[0].name;
-
-      fileDownload(data, outputNameFile);
     }
   };
+
+  useEffect(() => {
+    if (externalPopup) {
+      const timer = setInterval(() => {
+        if (!externalPopup) {
+          timer && clearInterval(timer);
+          return;
+        }
+
+        const currentUrl = externalPopup.location.href;
+
+        if (!currentUrl) {
+          return;
+        }
+        const searchParams = new URL(currentUrl).searchParams;
+
+        const code = searchParams.get('code');
+
+        if (code) {
+          externalPopup.close();
+          handleSubmit(code);
+        }
+      }, 500);
+    }
+  }, [externalPopup]);
 
   return (
     <Box
@@ -73,59 +145,32 @@ const Home: React.FC = () => {
       }}
     >
       <Container maxWidth="sm">
-        <Typography variant="h4">Assinador</Typography>
-        {code ? (
-          <Stack spacing={2}>
-            <PDfDropZone
-              files={files}
-              setFiles={setFiles}
-              multiple={scope === 'signature_session'}
+        <Stack spacing={2}>
+          <Typography variant="h4">Assinador</Typography>
+          <UserInfos />
+          {errorCardPropsInstance && (
+            <ErrorCard
+              title={errorCardPropsInstance.title}
+              message={errorCardPropsInstance.message}
+              action={errorCardPropsInstance.action}
+              actionLabel={errorCardPropsInstance.actionLabel}
             />
-            <Button
-              variant="contained"
-              onClick={handleSubmit}
-              disabled={codeWasUsed || loading}
-            >
-              Enviar
-            </Button>
-            <Button
-              variant="outlined"
-              onClick={() => navigate('/')}
-              startIcon={<ChevronLeftIcon />}
-            >
-              Voltar
-            </Button>
-          </Stack>
-        ) : (
-          <Stack spacing={2}>
-            <Tooltip
-              title="Selecionar um arquivo para ser assinado"
-              placement="top-start"
-              arrow
-            >
-              <Link
-                variant="button"
-                href={getGovBrUri('sign')}
-                onClick={() => setScope('sign')}
-              >
-                Assinar um arquivo
-              </Link>
-            </Tooltip>
-            <Tooltip
-              title="Selecionar vários arquivos para serem assinados"
-              placement="top-start"
-              arrow
-            >
-              <Link
-                variant="button"
-                href={getGovBrUri('signature_session')}
-                onClick={() => setScope('signature_session')}
-              >
-                Assinar arquivos em Lote
-              </Link>
-            </Tooltip>
-          </Stack>
-        )}
+          )}
+          {uploadProgress > 0 && (
+            <Box>
+              <LinearProgress variant="determinate" value={uploadProgress} />
+              <Typography>Progresso de upload: {uploadProgress}%</Typography>
+            </Box>
+          )}
+          <PDfDropZone files={files} setFiles={setFiles} multiple />
+          <Button
+            variant="contained"
+            onClick={connectClick}
+            disabled={loading || files.length <= 0}
+          >
+            Enviar
+          </Button>
+        </Stack>
       </Container>
     </Box>
   );

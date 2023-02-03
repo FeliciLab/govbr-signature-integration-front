@@ -9,7 +9,7 @@ interface FilesListProps {
 
 const FilesList: React.FC<FilesListProps> = ({ files, removeFile }) => {
   return (
-    <Box>
+    <Box maxHeight={220} overflow="auto">
       {files.map((file) => (
         <Box
           key={file.name}
